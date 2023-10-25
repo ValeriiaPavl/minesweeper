@@ -44,6 +44,7 @@ code {
 .header {
   display: flex;
   gap: 2rem;
+  align-items: center;
 }
 
 @keyframes rotate {
@@ -56,9 +57,28 @@ to {
 }
 
 .bomb {
-  height: 4rem;
+  height: 3rem;
   animation: rotate infinite 5s linear;
 
+}
+
+.control-panel {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  margin-bottom: 1rem;
+}
+
+.reset-button {
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.reset-button:hover {
+  background-color: blueviolet;
+  cursor: pointer;
 }
 
 .cell-container {
@@ -69,7 +89,6 @@ to {
   width: 60vh;
   height: 60vh;
   justify-content: space-between;
-  align-items:
 }
 
 

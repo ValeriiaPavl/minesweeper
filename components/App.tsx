@@ -1,5 +1,6 @@
 import React from "react";
 import Field from "./Field";
+import ControlPanel from "./ControlPanel";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
           <h1> Minesweeper</h1>
           <img className="bomb" src="bomb.svg" />
         </div>
+        <ControlPanel />
 
         <Field />
       </div>
