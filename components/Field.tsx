@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface CellProps {
   value: number;
@@ -6,10 +6,20 @@ interface CellProps {
 }
 
 const Cell = ({ value, key }: CellProps) => {
+  const [cellOpened, setOpen] = useState<boolean>(false);
+
   return (
-    <div className="cell" key={key}>
-      <p>{value}</p>
-    </div>
+    <>
+      {cellOpened ? (
+        <div key={key} className="cell cell-open">
+          <p>{value}</p>
+        </div>
+      ) : (
+        <div key={key} onClick={() => setOpen(true)} className="cell">
+          <p>{value}</p>
+        </div>
+      )}
+    </>
   );
 };
 
