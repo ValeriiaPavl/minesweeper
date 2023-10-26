@@ -106,3 +106,7 @@ to {
 .cell-open {
    box-shadow: 0.2em 0.2em 1.5em aqua;
 }
+
+.cell-flagged {
+  box-shadow: 0.2em 0.2em 1.5em red;
+}

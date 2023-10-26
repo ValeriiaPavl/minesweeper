@@ -6,21 +6,35 @@ interface CellProps {
 }
 
 const Cell = ({ value, key }: CellProps) => {
-  const [cellOpened, setOpen] = useState<boolean>(false);
-
-  return (
-    <>
-      {cellOpened ? (
-        <div key={key} className="cell cell-open">
-          <p>{value}</p>
-        </div>
-      ) : (
-        <div key={key} onClick={() => setOpen(true)} className="cell">
-          <p>{value}</p>
-        </div>
-      )}
-    </>
+  const [cellCondition, setCondition] = useState<"closed" | "open" | "flagged">(
+    "closed"
   );
+
+  if (cellCondition === "open") {
+    return (
+      <div key={key} className="cell cell-open">
+        <p>{value}</p>
+      </div>
+    );
+  } else {
+    if (cellCondition === "flagged") {
+      return (
+        <div key={key} className="cell cell-flagged">
+          <p>{value}</p>
+        </div>
+      );
+    }
+    return (
+      <div
+        key={key}
+        onClick={() => setCondition("open")}
+        onContextMenu={() => setCondition("flagged")}
+        className="cell"
+      >
+        <p>{value}</p>
+      </div>
+    );
+  }
 };
 
 function Field() {
