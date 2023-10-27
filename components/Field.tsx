@@ -41,6 +41,32 @@ function Field() {
       .fill(start)
       .map((x, y) => x + y * step);
   const fieldArray = range(1, 72, 1);
+  const getMines = () => {
+    const randomNumber = (minN: number, maxN: number): number =>
+      Math.floor(Math.random() * (maxN - minN) + minN);
+
+    const minesList = () => {
+      const mines = new Set<number>();
+      for (let i = 0; i < 10; i++) {
+        while (true) {
+          let randomN = randomNumber(1, 72);
+          if (mines.has(randomN)) {
+            console.log(randomN);
+            randomN = randomNumber(1, 72);
+          } else {
+            mines.add(randomN);
+            break;
+          }
+        }
+      }
+      console.log(mines);
+      return mines;
+    };
+    return minesList();
+  };
+
+  const randomMines = getMines();
+  console.log(randomMines);
 
 
   return (
