@@ -2,17 +2,25 @@ import React, { useState } from "react";
 
 interface CellProps {
   value: number;
+  mines: Set<Number>;
 }
 
-const Cell = ({ value }: CellProps) => {
+const Cell = ({ value, mines }: CellProps) => {
   const [cellCondition, setCondition] = useState<"closed" | "open" | "flagged">(
     "closed"
   );
 
+  let cellText = "";
+
+  if (mines.has(value)) {
+    cellText += "💣";
+  }
+
   if (cellCondition === "open") {
     return (
       <div className="cell cell-open">
-        <p>{value}</p>
+        {" "}
+        <p className="emodji">{cellText}</p>
       </div>
     );
   } else {
@@ -68,11 +76,14 @@ function Field() {
   const randomMines = getMines();
   console.log(randomMines);
 
-
   return (
     <div className="cell-container">
       {fieldArray.map((number) => (
-        <Cell key={`${number.toString()}_cell`} value={number} />
+        <Cell
+          key={`${number.toString()}_cell`}
+          value={number}
+          mines={randomMines}
+        />
       ))}
     </div>
   );
