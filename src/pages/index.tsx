@@ -1,5 +1,5 @@
 import React from "react";
-import App from "components/App.tsx";
+import App from "../../components/App";
 
 const Game = () => {
   return <App />;

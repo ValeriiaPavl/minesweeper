@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 
 interface CellProps {
   value: number;
@@ -10,16 +11,34 @@ const Cell = ({ value, mines }: CellProps) => {
     "closed"
   );
 
-  let cellText = "";
+  const [cellText, setCellText] = useState<"" | "💣" | "🚩">("");
 
-  if (mines.has(value)) {
-    cellText += "💣";
-  }
+  useEffect(() => {
+    if (cellCondition === "flagged") {
+      setCellText("🚩");
+    } else if (mines.has(value) && cellCondition === "open") {
+      setCellText("💣");
+    }
+  }, [cellCondition, mines, value]);
+
+  const handleClick = () => {
+    if (cellCondition !== "flagged") {
+      setCondition("open");
+    }
+  };
+
+  const handleContextMenu = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    if (cellCondition !== "open") {
+      setCondition(cellCondition === "flagged" ? "closed" : "flagged");
+    }
+  };
 
   if (cellCondition === "open") {
     return (
       <div className="cell cell-open">
-        {" "}
         <p className="emodji">{cellText}</p>
       </div>
     );
@@ -27,17 +46,23 @@ const Cell = ({ value, mines }: CellProps) => {
     if (cellCondition === "flagged") {
       return (
         <div className="cell cell-flagged">
-          <p>{value}</p>
+          <p className="emodji">{cellText}</p>
         </div>
       );
     }
     return (
       <div
-        onClick={() => setCondition("open")}
-        onContextMenu={() => setCondition("flagged")}
-        className="cell"
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+        className={`cell emodji ${
+          cellCondition === "open"
+            ? "cell-open"
+            : cellCondition === "flagged"
+            ? "cell-flagged"
+            : ""
+        }`}
       >
-        <p>{value}</p>
+        <p className="emodji">{cellText}</p>
       </div>
     );
   }
