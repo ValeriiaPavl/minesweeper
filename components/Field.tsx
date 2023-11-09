@@ -1,52 +1,47 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 
-interface CellProps {
-  value: number;
-  mines: Set<Number>;
+interface cellProps {
+  cellNumber: number;
+  cellState: "open" | "closed" | "flagged";
+  cellContent: "💣" | number | "";
+  onClick: () => void;
+  onContextMenu: () => void;
 }
 
-const Cell = ({ value, mines }: CellProps) => {
-  const [cellCondition, setCondition] = useState<"closed" | "open" | "flagged">(
-    "closed"
-  );
-
-  const [cellText, setCellText] = useState<"" | "💣" | "🚩">("");
-
-  useEffect(() => {
-    if (cellCondition === "flagged") {
-      setCellText("🚩");
-    } else if (mines.has(value) && cellCondition === "open") {
-      setCellText("💣");
-    }
-  }, [cellCondition, mines, value]);
+const Cell = ({
+  cellNumber,
+  cellState,
+  cellContent,
+  onClick,
+  onContextMenu,
+}: cellProps) => {
+  const cellText = "";
 
   const handleClick = () => {
-    if (cellCondition !== "flagged") {
-      setCondition("open");
-    }
+    onClick();
+    console.log("Cell is open!");
   };
 
   const handleContextMenu = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     e.preventDefault();
-    if (cellCondition !== "open") {
-      setCondition(cellCondition === "flagged" ? "closed" : "flagged");
-    }
+    onContextMenu();
+    console.log("Cell is flagged!");
   };
 
-  if (cellCondition === "open") {
+  if (cellState === "open") {
     return (
       <div className="cell cell-open">
-        <p className="emodji">{cellText}</p>
+        <p className="emodji">{cellContent}</p>
       </div>
     );
   } else {
-    if (cellCondition === "flagged") {
+    if (cellState === "flagged") {
       return (
         <div className="cell cell-flagged">
-          <p className="emodji">{cellText}</p>
+          <p className="emodji">🚩</p>
         </div>
       );
     }
@@ -54,13 +49,7 @@ const Cell = ({ value, mines }: CellProps) => {
       <div
         onClick={handleClick}
         onContextMenu={handleContextMenu}
-        className={`cell emodji ${
-          cellCondition === "open"
-            ? "cell-open"
-            : cellCondition === "flagged"
-            ? "cell-flagged"
-            : ""
-        }`}
+        className="cell cell-closed"
       >
         <p className="emodji">{cellText}</p>
       </div>
@@ -74,6 +63,7 @@ function Field() {
       .fill(start)
       .map((x, y) => x + y * step);
   const fieldArray = range(1, 72, 1);
+
   const getMines = () => {
     const randomNumber = (minN: number, maxN: number): number =>
       Math.floor(Math.random() * (maxN - minN) + minN);
@@ -101,13 +91,54 @@ function Field() {
   const randomMines = getMines();
   console.log(randomMines);
 
+  const bombAround = (currentCell: number) => {
+    const all_neighbors = [
+      currentCell + 9,
+      currentCell - 9,
+      currentCell + 1,
+      currentCell - 1,
+      currentCell + 9 - 1,
+      currentCell + 9 + 1,
+      currentCell - 9 + 1,
+      currentCell + 9 - 1,
+    ];
+    const containBomb = (cell: number) => (randomMines.has(cell) ? 1 : 0);
+    const bombCount = all_neighbors
+      .map((cell: number): number => containBomb(cell))
+      .reduce((acc, currentValue) => acc + currentValue, 0);
+    if (bombCount > 0) {
+      return bombCount;
+    } else {
+      return "";
+    }
+  };
+
+  const defineCellContent = (cellNumber: number) => {
+    if (randomMines.has(cellNumber)) {
+      return "💣";
+    } else {
+      return bombAround(cellNumber);
+    }
+  };
+
+  const fieldArrayData = fieldArray.map((cell: number): cellProps => {
+    return {
+      cellNumber: cell,
+      cellState: "closed",
+      cellContent: defineCellContent(cell),
+    };
+  });
+
   return (
     <div className="cell-container">
-      {fieldArray.map((number) => (
+      {fieldArrayData.map((cell: cellProps) => (
         <Cell
-          key={`${number.toString()}_cell`}
-          value={number}
-          mines={randomMines}
+          key={`${cell.cellNumber.toString()}_cell`}
+          cellNumber={cell.cellNumber}
+          cellState={cell.cellState}
+          cellContent={cell.cellContent}
+          onClick={() => console.log("done click")}
+          onContextMenu={() => console.log("done context menu")}
         />
       ))}
     </div>
