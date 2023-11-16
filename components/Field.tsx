@@ -5,8 +5,14 @@ interface cellProps {
   cellNumber: number;
   cellState: "open" | "closed" | "flagged";
   cellContent: "💣" | number | "";
-  onClick: () => void;
-  onContextMenu: () => void;
+  onClick: (cellNumber: number) => void;
+  onContextMenu: (cellNumber: number) => void;
+}
+
+interface CellData {
+  cellNumber: number;
+  cellState: "open" | "closed" | "flagged";
+  cellContent: "💣" | number | "";
 }
 
 const Cell = ({
@@ -18,16 +24,14 @@ const Cell = ({
 }: cellProps) => {
   const cellText = "";
 
-  const handleClick = () => {
-    onClick();
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    onClick(cellNumber);
     console.log("Cell is open!");
   };
 
-  const handleContextMenu = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    onContextMenu();
+    onContextMenu(cellNumber);
     console.log("Cell is flagged!");
   };
 
@@ -62,8 +66,9 @@ function Field() {
     Array(stop - start + 1)
       .fill(start)
       .map((x, y) => x + y * step);
-  const fieldArray = range(1, 72, 1);
+  const fieldArray = range(1, 72, 1); //generates numbers for the field cells
 
+  // generate 10 random mines
   const getMines = () => {
     const randomNumber = (minN: number, maxN: number): number =>
       Math.floor(Math.random() * (maxN - minN) + minN);
@@ -91,8 +96,9 @@ function Field() {
   const randomMines = getMines();
   console.log(randomMines);
 
+  // counts bombs around one cell
   const bombAround = (currentCell: number) => {
-    const all_neighbors = [
+    const allNeighbors = [
       currentCell + 9,
       currentCell - 9,
       currentCell + 1,
@@ -103,7 +109,8 @@ function Field() {
       currentCell + 9 - 1,
     ];
     const containBomb = (cell: number) => (randomMines.has(cell) ? 1 : 0);
-    const bombCount = all_neighbors
+
+    const bombCount = allNeighbors
       .map((cell: number): number => containBomb(cell))
       .reduce((acc, currentValue) => acc + currentValue, 0);
     if (bombCount > 0) {
@@ -121,7 +128,7 @@ function Field() {
     }
   };
 
-  const fieldArrayData = fieldArray.map((cell: number): cellProps => {
+  const fieldArrayData = fieldArray.map((cell: number): CellData => {
     return {
       cellNumber: cell,
       cellState: "closed",
@@ -129,16 +136,35 @@ function Field() {
     };
   });
 
+  const [field, setFieldState] = useState<CellData[]>(fieldArrayData);
+
+  const handleContextMenu = (cellN: number) => {
+    setFieldState((prevFieldState) =>
+      prevFieldState.map((cell: CellData) =>
+        cell.cellNumber === cellN ? { ...cell, cellState: "flagged" } : cell
+      )
+    );
+  };
+
+  const handleClick = (cellN: number) => {
+    setFieldState((prevFieldState) =>
+      prevFieldState.map((cell: CellData) =>
+        cell.cellNumber === cellN ? { ...cell, cellState: "open" } : cell
+      )
+    );
+    console.log("Hello");
+  };
+
   return (
     <div className="cell-container">
-      {fieldArrayData.map((cell: cellProps) => (
+      {field.map((cell: CellData) => (
         <Cell
           key={`${cell.cellNumber.toString()}_cell`}
           cellNumber={cell.cellNumber}
           cellState={cell.cellState}
           cellContent={cell.cellContent}
-          onClick={() => console.log("done click")}
-          onContextMenu={() => console.log("done context menu")}
+          onClick={() => handleClick(cell.cellNumber)}
+          onContextMenu={() => handleContextMenu(cell.cellNumber)}
         />
       ))}
     </div>
